@@ -1,0 +1,25 @@
+defaultEntryPoints = ["http", "https"]
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+
+  [entryPoints.web-secure]
+    address = ":443"
+[certificatesResolvers.sample.acme]
+  entryPoint = "https"
+  email = "malek.attia@pfechercheriattia.fr"
+  storage = "/etc/traefik/acme/acme.json"  
+  caServer = "https://acme-v02.api.letsencrypt.org/directory"
+  [certificatesResolvers.sample.acme.httpChallenge]
+    # used during the challenge
+    entryPoint = "web"
+  [certificatesResolvers.sample.acme.dnsChallenge]
+     provider = "cloudflare"
+     delayBeforeCheck = 0
+  [[certificatesResolvers.sample.acme.domains]]
+  main = "*.pfechercheriattia.fr"
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "pfechercheriattia.fr"
+exposedByDefault = false

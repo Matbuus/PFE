@@ -1,0 +1,36 @@
+version: '3'
+services:
+  reverse:
+    image: traefik:v2.0
+    ports: 
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    environment:
+      CLOUDFLARE_EMAIL: 'malek.attia@telecom-sudparis.eu'
+      CLOUDFLARE_API_KEY: 'f58f96f264470b712c995832654f06827c876'
+  cells:
+    image: pydio/cells:latest
+    ports:
+      - "8000:80"
+    environment:
+      - CELLS_BIND=localhost:443
+      - CELLS_EXTERNAL=localhost:443
+      - CELLS_NO_SSL=1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cells.entrypoints=websecure"
+      - "traefik.frontend.rule=Host:pfechercheriattia.fr"
+  mysql:
+     image: mysql:5.7
+     restart: always
+     environment:
+         MYSQL_ROOT_PASSWORD: P@ssw0rd
+         MYSQL_DATABASE: cells
+         MYSQL_USER: pydio
+         MYSQL_PASSWORD: P@ssw0rd
+     command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci]
+     ports: ["3306:3306"]
+    #extra_hosts:
+    #  - "<cells.domain.tld>:<ip_to_access_domain>"
