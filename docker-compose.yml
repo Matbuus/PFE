@@ -12,11 +12,14 @@ services:
     command:
       - "--api=true"
       - "--api.dashboard=true"
-      - " --api.insecure=true" 
+      - --entrypoints.dashboard.address=:80
+      - --providers.docker
+      - --api.insecure # Don't do that in production
+     # - " --api.insecure=true" 
       - "--api.debug=true"
       - "--providers.docker=true"
-      - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.dashboard.address=:8080"
+      - --entrypoints.websecure.address=:443
+     # - "--entrypoints.dashboard.address=:8080"
       - "--certificatesresolvers.mydnschallenge.acme.dnschallenge=true"
       - "--certificatesresolvers.mydnschallenge.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.mydnschallenge.acme.email=malek.attia@telecom-sudparis.eu"
@@ -26,23 +29,24 @@ services:
       CF_API_EMAIL: $CF_API_EMAIL
       CF_API_KEY: $CF_API_KEY
     labels:
-      - "traefik.http.routers.api.rule=Host(`pfechercheriattia.fr`)"
+      - "traefik.http.routers.api.rule=Host(`pfechercheriattia.fr`)  && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
       - "traefik.http.routers.api.entrypoints=dashboard"
-      - "traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
+     # - "traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/dashboard`)"
       - "traefik.http.routers.api.service=api@internal"
   cells:
     image: pydio/cells:latest
     ports:
-      - "8888:8888"
+      - "8888:80"
     environment:
-      - CELLS_BIND=171.33.88.157:8888
+      - CELLS_BIND=171.33.94.145:80
       - CELLS_EXTERNAL=https://pfechercheriattia.fr
       - CELLS_NO_TLS=1
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cells.entrypoints=websecure"
-      - "traefik.http.routers.cells.rule=Host(`pydio.pfechercheriattia.fr`)"
+      - "traefik.http.routers.cells.rule=Host(`pfechercheriattia.fr`)"
       - "traefik.http.routers.cells.tls.certresolver=mydnschallenge"
+      - "traefik.http.services.cells.loadbalancer.server.port=8888"
   mysql:
     image: mysql:5.7
     restart: always
@@ -53,4 +57,3 @@ services:
       MYSQL_PASSWORD: P@ssw0rd
     command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci]
     ports: ["3306:3306"]
-    
