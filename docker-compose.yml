@@ -1,7 +1,8 @@
 version: '3'
 services:
   reverse:
-    image: traefik:v2.0
+    image: attiamalek/traefik:firsttry
+    restart: always
     ports:
       - "443:443"
       - "8080:8080"
@@ -32,7 +33,8 @@ services:
       - "traefik.http.routers.api.entrypoints=dashboard"
       - "traefik.http.routers.api.service=api@internal"
   cells:
-    image: pydio/cells:latest
+    image: attiamalek/cells:firsttry
+    restart: always
     ports:
       - "8888:80"
     environment:
