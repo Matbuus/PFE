@@ -19,7 +19,6 @@ services:
       - "--api.debug=true"
       - "--providers.docker=true"
       - --entrypoints.websecure.address=:443
-     # - "--entrypoints.dashboard.address=:8080"
       - "--certificatesresolvers.mydnschallenge.acme.dnschallenge=true"
       - "--certificatesresolvers.mydnschallenge.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.mydnschallenge.acme.email=malek.attia@telecom-sudparis.eu"
