@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose -v convert -f docker-compose.yml -o export
+    kompose.version: 1.16.0 (0c01309)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: cells
+  name: cells
+  namespace: traefik
+spec:
+  selector:
+    matchLabels:
+      io.kompose.service: cells
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: cells
+    spec:
+      containers:
+      - env:
+        - name: CELLS_BIND
+          value: https://0.0.0.0:80
+        - name: CELLS_EXTERNAL
+          value: https://pydio.pfechercheriattia.fr
+        - name: CELLS_NO_TLS
+          value: "1"
+        - name: CELLS_WORKING_DIR
+          value: /home/outscale/cells
+        image: attiamalek/cells:firsttry
+        name: cells
+        ports:
+        - containerPort: 80
+          #  - containerPort: 443
+        resources:
+          limits:
+            cpu: "1500m" 
+        volumeMounts:
+                #  - name: cellsdir
+                #mountPath: /home/outscale/cells
+        - name: data
+          mountPath: /home/outscale/cells
+      volumes:
+              #- name: cellsdir
+              #hostPath:
+              #path: "/home/outscale/cells"
+      - name: data
+        #hostPath:
+        # path: "/home/outscale/cells"
+        persistentVolumeClaim:
+          claimName: cells-pv-claim
+        # restartPolicy: Always
+status: {}

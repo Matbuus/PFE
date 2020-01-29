@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+ name: traefik-cells
+ namespace: traefik
+ annotations:
+   kubernetes.io/ingress.class: traefik
+spec:
+ rules:
+ - host: pydio.pfechercheriattia.fr
+   http:
+     paths:
+     - backend:
+         serviceName: cells
+         servicePort: 8888
+ - host: pfechercheriattia.fr
+   http:
+     paths:
+     - backend:
+         serviceName: traefik
+         servicePort: web

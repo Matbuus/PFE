@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cells
+  labels:
+    app: cells
+spec:
+  containers:
+  - name: cells 
+    image: attiamalek/cells:firsttry
+    resources:
+      requests:
+        cpu: 0.5
+    ports:
+    - containerPort: 8888

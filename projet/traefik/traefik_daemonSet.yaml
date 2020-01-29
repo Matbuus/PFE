@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+ name: traefik-ingress-controller
+ namespace: traefik
+ labels:
+   k8s-app: traefik-ingress-lb
+   kubernetes.io/cluster-service: "true"
+spec:
+ selector:
+   matchLabels:
+     k8s-app: traefik-ingress-lb
+ template:
+   metadata:
+     labels:
+       k8s-app: traefik-ingress-lb
+       name: traefik-ingress-lb
+   spec:
+     hostNetwork: true # workaround
+     serviceAccountName: traefik-ingress-controller
+     terminationGracePeriodSeconds: 60
+     tolerations:
+     - key: node-role.kubernetes.io/master
+       effect: NoSchedule
+     containers:
+     - image: traefik:v1.7.7
+       name: traefik-ingress-lb
+       imagePullPolicy: Always
+       env:
+       - name: CLOUDFLARE_API_KEY
+         value: "f58f96f264470b712c995832654f06827c876"
+       - name: CLOUDFLARE_EMAIL
+         value: "malek.attia@telecom-sudparis.eu"
+       ports:
+        - name: http
+          containerPort: 80
+          hostPort: 80
+        - name: admin
+          containerPort: 8080
+          hostPort: 8080
+        - name: https
+          containerPort: 443
+          hostPort: 443
+       volumeMounts:
+         - mountPath: "/config"
+           name: "config"
+         - mountPath: "/letsencrypt"
+           name: "letsencrypt"
+       resources:
+         requests:
+           cpu: 100m
+           memory: 20Mi
+       args:
+       - --kubernetes
+       - --configfile=/config/traefik.toml
+       - --logLevel=DEBUG
+     volumes:
+     - name: config
+       configMap:
+         name: traefik-conf
+     - name: letsencrypt
+       hostPath:
+         path: "/letsencrypt"

@@ -1,0 +1,1 @@
+kubectl apply cells-deployment.yaml, cells-service.yaml, mysql-deployment.yaml, mysql-service.yaml, reverse-claim0-persistentvolumeclaim.yaml, reverse-claim1-persistentvolumeclaim.yaml, reverse-deployment.yaml, reverse-service.yaml

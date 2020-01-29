@@ -41,19 +41,11 @@ services:
       - CELLS_EXTERNAL=https://pydio.pfechercheriattia.fr
       - CELLS_NO_TLS=1
     labels:
-      #- "traefik.enable=true"
-      #- "traefik.http.routers.cells.rule=Host(`pydio.pfechercheriattia.fr`)"
-      #- "traefik.http.routers.cells.entrypoints=websecure"
-      #- "traefik.http.routers.cells.tls.certresolver=mydnschallenge"
-      #- "traefik.http.routers.cells.service=cells"
-      #- "traefik.http.services.cells.loadbalancer.server.port=8888"
-      #- "traefik.http.routers.cells=cells"
-      #- "traefik.http.services.cells.loadbalancer.server.port=80"
        - "traefik.enable=true"
        - "traefik.http.routers.cells.entrypoints=dashboard"
        - "traefik.http.routers.cells.rule=Host(`pydio.pfechercheriattia.fr`)"
-       - "traefik.http.middlewares.cells-https-redirect.redirectscheme.scheme=https"
-       - "traefik.http.routers.cells.middlewares=cells-https-redirect"
+       - "traefik.http.middlewares.redirect.redirectscheme.scheme=https"
+       - "traefik.http.routers.cells.middlewares=redirect"
        - "traefik.http.routers.cells-secure.entrypoints=websecure"
        - "traefik.http.routers.cells-secure.rule=Host(`pydio.pfechercheriattia.fr`)"
        - "traefik.http.routers.cells-secure.tls=true"

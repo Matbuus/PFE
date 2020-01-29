@@ -1,0 +1,67 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert
+    kompose.version: 1.16.0 (0c01309)
+    traefik.http.routers.api.entrypoints: dashboard
+    traefik.http.routers.api.rule: Host(`pfechercheriattia.fr`)  && (PathPrefix(`/api`)
+      || PathPrefix(`/dashboard`))
+    traefik.http.routers.api.service: api@internal
+  creationTimestamp: null
+  labels:
+    io.kompose.service: reverse
+  name: reverse
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: reverse
+    spec:
+      containers:
+      - args:
+        - --api=true
+        - --api.dashboard=true
+        - --entrypoints.dashboard.address=:80
+        - --providers.docker
+        - --api.insecure
+        - --api.debug=true
+        - --providers.docker=true
+        - --entrypoints.websecure.address=:443
+        - --certificatesresolvers.mydnschallenge.acme.dnschallenge=true
+        - --certificatesresolvers.mydnschallenge.acme.dnschallenge.provider=cloudflare
+        - --certificatesresolvers.mydnschallenge.acme.email=malek.attia@telecom-sudparis.eu
+        - --certificatesresolvers.mydnschallenge.acme.storage=/letsencrypt/acme.json
+        - --log.level=DEBUG
+        env:
+        - name: CF_API_EMAIL
+          value: malek.attia@telecom-sudparis.eu
+        - name: CF_API_KEY
+          value: f58f96f264470b712c995832654f06827c876
+        image: attiamalek/traefik:firsttry
+        name: reverse
+        ports:
+        - containerPort: 443
+        - containerPort: 8080
+        - containerPort: 80
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/run/docker.sock
+          name: reverse-claim0
+          readOnly: true
+        - mountPath: /letsencrypt
+          name: reverse-claim1
+      restartPolicy: Always
+      volumes:
+      - name: reverse-claim0
+        persistentVolumeClaim:
+          claimName: reverse-claim0
+          readOnly: true
+      - name: reverse-claim1
+        persistentVolumeClaim:
+          claimName: reverse-claim1
+status: {}
